@@ -1,8 +1,8 @@
 from django.contrib.auth import get_product_model
 from rest_framework import serializers
-from products.models import Comment
+from products.models import Comment, Product
 
-Product = get_product_model
+#Product = get_product_model
 #Comment = get_comment_model
 
 

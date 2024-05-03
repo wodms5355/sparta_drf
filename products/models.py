@@ -4,6 +4,7 @@ from django.db import models
 # Create your models here.
 class Product(models.Model):
     login_status = models.BooleanField(default=False)
+    name = models.CharField(max_length=100)
     title = models.CharField(max_length=20)
     content = models.TextField()
     image = models.ImageField(("이미지"), upload_to=None, height_field=None, width_field=None, max_length=None)
