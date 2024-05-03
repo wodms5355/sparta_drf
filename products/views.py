@@ -7,13 +7,18 @@ from rest_framework.views import APIView
 
 
 class ProductListAPIView(APIView):  # APIView가 갖고 있는 기능이 많다!
-    def get(self, request):  # 메소드 호출할때 self와 request는 기본값, 필요에 따라 pk도 +@로 작성
+    def get(self, request):
+        # 메소드 호출할때 self와 request는 기본값, 필요에 따라 pk도 +@로 작성
         products = Product.objects.all()  # Poduct 안에 있는 모든것
-        serializer = ProductSerializer(products, many=True)  # get은 목록을 읽는것이기 때문에 하나만 보여주는게 아니라서 many를 넣어줘야함
-        return Response(serializer.data)  # 바로 위에서 정의해놓은 serializer의 data값을 호출해
+        serializer = ProductSerializer(products, many=True)
+        # get은 목록을 읽는것이기 때문에 하나만 보여주는게 아니라서 many를 넣어줘야함
+        return Response(serializer.data)
+        # 바로 위에서 정의해놓은 serializer의 data값을 호출해
 
-    def post(self, request):  # 생성하는 매소드(=create)
-        serializer = ProductSerializer(data=request.data)  # 직렬화! Product class안에 있는 값들을 data로 불러와서 직렬화(나열이라고 할수도?)
+    def post(self, request):
+        # 생성하는 매소드(=create)
+        serializer = ProductSerializer(data=request.data)
+        # 직렬화! Product class안에 있는 값들을 data로 불러와서 직렬화(요청 받은 데이터값을 데이터라고 하자!)
         if serializer.is_valid(raise_exception=True):  # 단, 모두 다 생성할 수는 없으니 조건이 붙음. 예외적용도 가능 (무슨 예외적용인지 한번더 질문하기)
             serializer.save()  # 모든것의 기본은 저-장!
             return Response(serializer.data, status=status.HTTP_201_CREATED)

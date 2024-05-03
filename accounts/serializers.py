@@ -6,6 +6,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = [
+            #조건이라고 할수 있지
             "id",
             "email",
             "username",
