@@ -1,19 +1,63 @@
+from itertools import product
+from lib2to3.fixes.fix_input import context
+
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from .serializers import CommentSerializer, ProductSerializer
-from .models import Product, Comment
+from .models import Comment, Product
 from rest_framework import status
 from rest_framework.views import APIView
 
 
 class ProductListAPIView(APIView):  # APIView가 갖고 있는 기능이 많다!
-    def get(self, request):
-        # 메소드 호출할때 self와 request는 기본값, 필요에 따라 pk도 +@로 작성
+    def get(self, request):#<상품목록조회>
+        # self = 해당 메서드가 클래스의 인스턴스에 속하고 있다는 의미
+        #request = 클라이언트로부터의 HTTP 요청을 처리하고 요청받은 데이터를 사용하기 위해
+        # drf에서 crud 메소드 호출할때 self와 request는 기본값, 필요에 따라 pk도 +@로 작성
         products = Product.objects.all()  # Poduct 안에 있는 모든것
         serializer = ProductSerializer(products, many=True)
         # get은 목록을 읽는것이기 때문에 하나만 보여주는게 아니라서 many를 넣어줘야함
         return Response(serializer.data)
         # 바로 위에서 정의해놓은 serializer의 data값을 호출해
+
+    def post(self, request): #<상품생성>
+        # self = 해당 메서드가 클래스의 인스턴스에 속하고 있다는 의미
+        #request = 클라이언트로부터의 HTTP 요청을 처리하고 요청받은 데이터를 사용하기 위해
+        username = request.data.get('username')#이름
+        title = request.data.get('title')#제목
+        content = request.data.get('content')#내용
+        image = request.data.get('image')#이미지
+        #요청받은 데이터에서 "name","title","context","image" 값을 가져와서 각각의 이름으로 다시 정의
+        #왼쪽에 있는 "name","title","context","image"는 각각 클라이언트가 POST 요청을 보낼 때 사용한 데이터의 키 값
+        #오른쪽에 있는 "name","title","context","image"는 각각 요청 받은 데이터
+
+        if not (username and title and content and image):
+            #=이중 하나라도 없다면
+            return Response({"error": "Where are name,title,content,image?"}, status=400)
+        #""의 내용을 보여주고, 400상태라는 걸 알려줘!
+
+        porduct = Product.objects.create(
+        #product=Product 클래스에서 생성한 name,title,content,image에 대한 값
+            username=username,
+            title=title,
+            content=content,
+            image=image,
+        )
+        serializer = ProductSerializer(product)#product는 위에서 정의한 값
+        #serializer이라고 정의된것은,
+        # models.py에 정의된 product에 담긴 내용을 ProductSerializer에 맞는 조건에 대한 값
+        return Response(serializer.data, status=201)
+        #serializer를 통해 직렬화 한 데이터를 보여줘 그리고 성공적으로 생성 됐다는 상태를 보여줘
+
+        #{
+        #    'login_status': porduct.login_status,
+        #    'name': porduct.name,
+        #    'title': porduct.title,
+        #    'context': porduct.context,
+        #    'image': porduct.image.url,
+        #    },
+        #이렇게 각각 정의해줘도 되지만, serializers.py를 이용하면 코드를 간결하게 표현할 수 있다!
+
 
     def post(self, request):
         # 생성하는 매소드(=create)
@@ -29,6 +73,10 @@ class ProductDetailAPIView(APIView):
     # pk가 작성됐다면 detail?!
 
     def get_object(self, pk):
+        #self = 해당 메서드가 클래스 인스턴스에 속하고 있다는 것을 의미
+        #pk = API에서 특정 객체를 식별하고 조회할 때 사용!
+        #그래서 detailview는 특정 객체를 겨냥해서 보여주기 때문에 pk값이 필요함
+
         return get_object_or_404(Product, pk=pk)  # 요청값(pk)이(가) 없다면 404에러를 보여 주라는 건가....?
         # product class에서 가져온 기본키가 pk!
         # 똑같은 코드를 반복적으로 사용하지 않기위해 같은 내용은 함수로 묶어줬음!

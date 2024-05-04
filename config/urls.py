@@ -28,6 +28,11 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
+    #settings.py에 DEBUG=True로 정의되어 있음
+    #장고에서의 DEBUG모드는 개발모드를 의미
+    #프로젝트가 DEBUG모드 일때만 실행되도록 해줘! = 만약 프로젝트가 DEBUG모드이면 실행 해줘!
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    #개발 시에만 MEDIA_URL에 대한 파일 서빙을 활성화하고, 배포 시에는 비활성화 해달라는 뜻
+    #보안을 위해서도 있지만 조금 더 개발을 편하게 하게하기 위해서!
 
 
