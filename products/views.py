@@ -2,6 +2,7 @@ from itertools import product
 from lib2to3.fixes.fix_input import context
 
 from django.shortcuts import get_object_or_404
+from django.core.paginator import Paginator #settings.py에 내가 작성한 Paginator!
 from rest_framework.response import Response
 from .serializers import CommentSerializer, ProductSerializer
 from .models import Comment, Product
@@ -9,16 +10,24 @@ from rest_framework import status
 from rest_framework.views import APIView
 
 
+
 class ProductListAPIView(APIView):  # APIView가 갖고 있는 기능이 많다!
+#pagenaition을 사용하기 위해서는
+
     def get(self, request):#<상품목록조회>
-        # self = 해당 메서드가 클래스의 인스턴스에 속하고 있다는 의미
-        #request = 클라이언트로부터의 HTTP 요청을 처리하고 요청받은 데이터를 사용하기 위해
-        # drf에서 crud 메소드 호출할때 self와 request는 기본값, 필요에 따라 pk도 +@로 작성
-        products = Product.objects.all()  # Poduct 안에 있는 모든것
-        serializer = ProductSerializer(products, many=True)
-        # get은 목록을 읽는것이기 때문에 하나만 보여주는게 아니라서 many를 넣어줘야함
-        return Response(serializer.data)
-        # 바로 위에서 정의해놓은 serializer의 data값을 호출해
+
+       # self = 해당 메서드가 클래스의 인스턴스에 속하고 있다는 의미
+       #request = 클라이언트로부터의 HTTP 요청을 처리하고 요청받은 데이터를 사용하기 위해
+       # drf에서 crud 메소드 호출할때 self와 request는 기본값, 필요에 따라 pk도 +@로 작성
+       products = Product.objects.all()  # Poduct 안에 있는 모든것
+       paginator = Paginator(products, 2)
+       page = paginator.get_page(paginator)
+
+       serializer = ProductSerializer(page, many=True)
+       #serializer = ProductSerializer(products, many=True)
+       # get은 목록을 읽는것이기 때문에 하나만 보여주는게 아니라서 many를 넣어줘야함
+       return Response(serializer.data)
+       # 바로 위에서 정의해놓은 serializer의 data값을 호출해
 
     def post(self, request): #<상품생성>
         # self = 해당 메서드가 클래스의 인스턴스에 속하고 있다는 의미

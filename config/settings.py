@@ -134,7 +134,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS':
-        ('rest_framework.pagination.PageNumberPagination',)
+        'rest_framework.pagination.PageNumberPagination',
+         'PAGE_SIZE':5
+    #pagenation을 사용하면 사용자는 너무 많은 데이터를 한 번에 표시하는 대신
+    #페이지 당 일부 데이터만 볼 수 있다.
 }
 
 SIMPLE_JWT = {
