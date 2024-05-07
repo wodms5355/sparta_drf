@@ -2,7 +2,8 @@ from itertools import product
 from lib2to3.fixes.fix_input import context
 
 from django.shortcuts import get_object_or_404
-from django.core.paginator import Paginator #settings.py에 내가 작성한 Paginator!
+from django.core.paginator import Paginator
+#django global에 지정 되어있는 함수 Paginator!
 from rest_framework.response import Response
 from .serializers import CommentSerializer, ProductSerializer
 from .models import Comment, Product
@@ -19,8 +20,11 @@ class ProductListAPIView(APIView):  # APIView가 갖고 있는 기능이 많다!
        # self = 해당 메서드가 클래스의 인스턴스에 속하고 있다는 의미
        #request = 클라이언트로부터의 HTTP 요청을 처리하고 요청받은 데이터를 사용하기 위해
        # drf에서 crud 메소드 호출할때 self와 request는 기본값, 필요에 따라 pk도 +@로 작성
-       products = Product.objects.all()  # Poduct 안에 있는 모든것
+       products = Product.objects.all()  # Product models.py 안에 있는 모든것
        paginator = Paginator(products, 2)
+       # paginator라는 변수를 지정
+       #Paginator라는 함수를 import해줬음 근데 이건 global django에서(내장함수) 가져온거임!
+       #Paginator이라는 class안에 들어있는 함수(매직메소드)/def __init__(self, object_list, per_page)=> 얘네는 필수!
        page = paginator.get_page(paginator)
 
        serializer = ProductSerializer(page, many=True)
@@ -91,7 +95,7 @@ class ProductDetailAPIView(APIView):
         # 똑같은 코드를 반복적으로 사용하지 않기위해 같은 내용은 함수로 묶어줬음!
 
     def get(self, request, pk):  # 메소드 호출할때 self와 request는 기본값, 필요에 따라 pk도 +@로 작성
-        products = self.get.object(pk)  # poducts 안에 있는 pk값
+        products = self.get_object(pk)  # poducts 안에 있는 pk값
         serializer = ProductSerializer(products, many=True)  # get은 목록을 읽는것이기 때문에 하나만 보여주는게 아니라서 many를 넣어줘야함
         #QuerySets(전달 받은 모델의 객체 목록)을 확인 해줘야 하기 때문에도 many=True을 써야함.
         return Response(serializer.data)  # 바로 위에서 정의해놓은 serializer의 Product class의 데이터를 직렬화해서 보여줘라!
