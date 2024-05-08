@@ -33,7 +33,7 @@ class SignupAPIView(APIView):
         # username도 유일 해야 한다고 했기 때문에 이미 해당 내용이 존재 한다면, {}를 보여줘
 
         user = get_user_model().objects.create(
-            #create 하고 나면 생성된 user를 반환 하니까 user=로 정의 해줘야함
+            #create 하고 나면 생성된 user를 반환 하니까 user=로 정의 해줘야 함
             email=email,
             username=username,
             password=data.get("password"),

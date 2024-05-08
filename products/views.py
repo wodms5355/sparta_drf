@@ -1,6 +1,4 @@
 from itertools import product
-from lib2to3.fixes.fix_input import context
-
 from django.shortcuts import get_object_or_404
 from django.core.paginator import Paginator
 #django global에 지정 되어있는 함수 Paginator!
@@ -11,35 +9,35 @@ from rest_framework import status
 from rest_framework.views import APIView
 
 
-
 class ProductListAPIView(APIView):  # APIView가 갖고 있는 기능이 많다!
-#pagenaition을 사용하기 위해서는
+    #pagenaition을 사용하기 위해서는
 
-    def get(self, request):#<상품목록조회>
+    def get(self, request):
+        #<상품목록조회>
 
-       # self = 해당 메서드가 클래스의 인스턴스에 속하고 있다는 의미
-       #request = 클라이언트로부터의 HTTP 요청을 처리하고 요청받은 데이터를 사용하기 위해
-       # drf에서 crud 메소드 호출할때 self와 request는 기본값, 필요에 따라 pk도 +@로 작성
-       products = Product.objects.all()  # Product models.py 안에 있는 모든것
-       paginator = Paginator(products, 2)
-       # paginator라는 변수를 지정
-       #Paginator라는 함수를 import해줬음 근데 이건 global django에서(내장함수) 가져온거임!
-       #Paginator이라는 class안에 들어있는 함수(매직메소드)/def __init__(self, object_list, per_page)=> 얘네는 필수!
-       page = paginator.get_page(paginator)
-
-       serializer = ProductSerializer(page, many=True)
-       #serializer = ProductSerializer(products, many=True)
-       # get은 목록을 읽는것이기 때문에 하나만 보여주는게 아니라서 many를 넣어줘야함
-       return Response(serializer.data)
-       # 바로 위에서 정의해놓은 serializer의 data값을 호출해
-
-    def post(self, request): #<상품생성>
         # self = 해당 메서드가 클래스의 인스턴스에 속하고 있다는 의미
         #request = 클라이언트로부터의 HTTP 요청을 처리하고 요청받은 데이터를 사용하기 위해
-        username = request.data.get('username')#이름
-        title = request.data.get('title')#제목
-        content = request.data.get('content')#내용
-        image = request.data.get('image')#이미지
+        # drf에서 crud 메소드 호출할때 self와 request는 기본값, 필요에 따라 pk도 +@로 작성
+        products = Product.objects.all()  # Product models.py 안에 있는 모든것
+        paginator = Paginator(products, 2)
+        # paginator라는 변수를 지정
+        #Paginator라는 함수를 import해줬음 근데 이건 global django에서(내장함수) 가져온거임!
+        #Paginator이라는 class안에 들어있는 함수(매직메소드)/def __init__(self, object_list, per_page)=> 얘네는 필수!
+        page = paginator.get_page(paginator)
+
+        serializer = ProductSerializer(page, many=True)
+        #serializer = ProductSerializer(products, many=True)
+        # get은 목록을 읽는것이기 때문에 하나만 보여주는게 아니라서 many를 넣어줘야함
+        return Response(serializer.data)
+        # 바로 위에서 정의해놓은 serializer의 data값을 호출해
+
+    def post(self, request):  #<상품생성>
+        # self = 해당 메서드가 클래스의 인스턴스에 속하고 있다는 의미
+        #request = 클라이언트로부터의 HTTP 요청을 처리하고 요청받은 데이터를 사용하기 위해
+        username = request.data.get('username')  #이름
+        title = request.data.get('title')  #제목
+        content = request.data.get('content')  #내용
+        image = request.data.get('image')  #이미지
         #요청받은 데이터에서 "name","title","context","image" 값을 가져와서 각각의 이름으로 다시 정의
         #왼쪽에 있는 "name","title","context","image"는 각각 클라이언트가 POST 요청을 보낼 때 사용한 데이터의 키 값
         #오른쪽에 있는 "name","title","context","image"는 각각 요청 받은 데이터
@@ -50,13 +48,13 @@ class ProductListAPIView(APIView):  # APIView가 갖고 있는 기능이 많다!
         #""의 내용을 보여주고, 400상태라는 걸 알려줘!
 
         porduct = Product.objects.create(
-        #product=Product 클래스에서 생성한 name,title,content,image에 대한 값
+            #product=Product 클래스에서 생성한 name,title,content,image에 대한 값
             username=username,
             title=title,
             content=content,
             image=image,
         )
-        serializer = ProductSerializer(product)#product는 위에서 정의한 값
+        serializer = ProductSerializer(product)  #product는 위에서 정의한 값
         #serializer이라고 정의된것은,
         # models.py에 정의된 product에 담긴 내용을 ProductSerializer에 맞는 조건에 대한 값
         return Response(serializer.data, status=201)
@@ -70,7 +68,6 @@ class ProductListAPIView(APIView):  # APIView가 갖고 있는 기능이 많다!
         #    'image': porduct.image.url,
         #    },
         #이렇게 각각 정의해줘도 되지만, serializers.py를 이용하면 코드를 간결하게 표현할 수 있다!
-
 
     def post(self, request):
         # 생성하는 매소드(=create)
@@ -106,15 +103,28 @@ class ProductDetailAPIView(APIView):
         serializer = ProductSerializer(products, data=request.data, partial=True)  # Product class의 유효성 검사
         # 24번 라인에 정의한 앱...?,요청 받아올 데이터,partial=True를 붙이게 될 경우, 변경 원하는 정보만 보내고 그 정보만 변경해서 저장 가능하다!)
         # 여기서 궁금증,,, partial=True가 patch메소드 비스무리한 역할을 해준다는건가?
+        if not request.pk == products.pk:
+            return Response({"error": "권한 없는 사용자 입니다! 계정을 확인해주세요"}, status=status.HTTP_400_BAD_REQUEST)
+        #만약 요청받은 기본키와 위의 get_object로 받아온 pk의 값이 일치하지 않으면 에러메세지를 보여줘
+
         if serializer.is_valid(raise_exception=True):
             serializer.save()  # 얘도 저장 필수
-            return Response(serializer.data)  # 유효성 검사가 완료된 데이터를 불러와죠!
+            return Response(serializer.data, status=200)
+            # 정상적으로 수정이 이루어 졌다면, 유효성 검사가 완료된 데이터를 불러와죠!
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            # 그렇지 않다면, 에러메세지를 보여줘
 
     def delete(self, request, pk):
         products = self.get_object(pk)
         products.delete()  # 위에서 정의한 pk를 가진 데이터를 delete메소드를 이용해 삭제해줘!
         data = {"pk": f"{pk} is deleted."}
         # f태그를 달면 요청한 값을 불러올 수 있어서, pk값을 따로 지정하지 않아도 컴퓨터가 알아서 불러다줌
+
+        if not request.pk == products.pk:
+            return Response({"error": "권한 없는 사용자 입니다! 계정을 확인해주세요"}, status=status.HTTP_400_BAD_REQUEST)
+        # 만약 요청받은 기본키와 위의 get_object로 받아온 pk의 값이 일치하지 않으면 에러메세지를 보여줘
+
         return Response(data, status=status.HTTP_200_OK)
         # 요청한 것들이 삭제되면,서버가 정상적으로 응답했다는걸 보여줘!
 
